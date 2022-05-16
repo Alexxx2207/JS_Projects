@@ -1,0 +1,9 @@
+function printEevryNthNumber(arr, number) {
+    let result = [];
+
+    for (let index = 0; index < arr.length; index+=number) {
+        result.push(arr[index]);        
+    }
+
+    return result;
+}
