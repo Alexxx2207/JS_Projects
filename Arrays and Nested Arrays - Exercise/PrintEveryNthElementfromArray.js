@@ -1,4 +1,4 @@
-function printEevryNthNumber(arr, number) {
+function printEveryNthNumber(arr, number) {
     let result = [];
 
     for (let index = 0; index < arr.length; index+=number) {
