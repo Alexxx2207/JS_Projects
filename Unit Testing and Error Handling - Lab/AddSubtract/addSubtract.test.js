@@ -5,7 +5,6 @@ const createCalculator = require('./addSubtract');
 describe('Add/Subtract function', () => {
     it('should return an object', () => {
         expect(createCalculator()).to.be.an('object');
-        expect(createCalculator()).to.be.a('object');
     });
     it('should return an object with add()', () => {
         expect(createCalculator()).to.have.property('add');
