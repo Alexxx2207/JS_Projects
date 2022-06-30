@@ -126,4 +126,4 @@ function attachEvents2() {
 
 
 //attachEvents();
-attachEvents2();
+attachEventsAsyncAwait();
