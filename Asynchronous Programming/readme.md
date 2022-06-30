@@ -11,5 +11,5 @@
 
 ### ***Note: If the server is not started, you cannot fetch data from it.***
 
-:warning: On exercise **6**, there are **2 implemented ways** of solving it. The first one is using **Promise.prototype.then()** syntax and the second one is using the new **async/await** syntax. You only need to **comment** the function call that you **don't want to test**. :warning:
+> :warning: On exercise **6**, there are **2 implemented ways** of solving it. The first one is using **Promise.prototype.then()** syntax and the second one is using the new **async/await** syntax. You only need to **comment** the function call that you **don't want to test**.
 
