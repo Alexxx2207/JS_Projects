@@ -3,7 +3,7 @@ import { likeMovie, getLikes, isAlreadyLiked } from "./likeMovie.js";
 import { getUser } from "../authService/authentication.js";
 import { fillEditForm } from "./editMovie.js";
 import { router } from "../router.js";
-import { routesMovie } from "../constants.js";
+import { authToken, routesMovie } from "../constants.js";
 
 const movieList = document.getElementById('movies');
 
@@ -45,44 +45,27 @@ async function renderMovies(movies) {
         </div>`;
 
         let deleteBtn = filmDiv.querySelector('button:nth-of-type(1)');
+        let editBtn = filmDiv.querySelector('button:nth-of-type(2)');
+        let likeBtn = filmDiv.querySelector('button:nth-of-type(3)');
+        let likeSpan = filmDiv.querySelector('span');
 
         deleteBtn.addEventListener('click', function (e) {
             deleteFilm(e.target.dataset.movieid);
         });
-
-        let editBtn = filmDiv.querySelector('button:nth-of-type(2)');
 
         editBtn.addEventListener('click', function (e) {
             router(routesMovie.editMovie);
             fillEditForm(movie._id);
         });
 
-        let likeBtn = filmDiv.querySelector('button:nth-of-type(3)');
-        let likeSpan = filmDiv.querySelector('span');
-
         likeBtn.addEventListener('click', function (e) {
             likeMovie(e.target.dataset.movieid, e.target.dataset.ownerid);
         });
 
-        getUser().then(user => {
-            isAlreadyLiked(movie._id, user._id).then(res => {
-                if (res) {
-                    likeBtn.style.display = 'none';
-                } else if(user._id != movie._ownerId){
-                    likeSpan.style.display = 'none';
-                }
-            });
-            if(user._id == movie._ownerId) {
-                likeBtn.style.display = 'none';
-            }
-            if(user._id != movie._ownerId) {
-                deleteBtn.style.display = 'none';
-                editBtn.style.display = 'none';
-            }
-        });
-
         getLikes(movie._id).then(likes =>
             likeSpan.textContent = `Liked ${likes}`);
+
+        configureButtonsDisplays(movie, deleteBtn, editBtn, likeBtn, likeSpan);
 
         fragment.append(filmDiv);
     });
@@ -98,4 +81,32 @@ async function loadMovies() {
 
     let data = await response.json();
     return data;
+}
+
+function configureButtonsDisplays(movie, deleteBtn, editBtn, likeBtn, likeSpan) {
+
+    let token = sessionStorage.getItem(authToken);
+    if (token) {
+        getUser().then(user => {
+            isAlreadyLiked(movie._id, user._id).then(res => {
+                if (res) {
+                    likeBtn.style.display = 'none';
+                } else if (user._id != movie._ownerId) {
+                    likeSpan.style.display = 'none';
+                }
+            });
+            if (user._id == movie._ownerId) {
+                likeBtn.style.display = 'none';
+                likeBtn.style.display = 'none';
+            }
+            if (user._id != movie._ownerId) {
+                deleteBtn.style.display = 'none';
+                editBtn.style.display = 'none';
+            }
+        });
+    } else {
+        deleteBtn.style.display = 'none';
+        editBtn.style.display = 'none';
+        likeBtn.style.display = 'none';
+    }
 }
