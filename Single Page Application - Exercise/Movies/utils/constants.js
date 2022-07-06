@@ -2,8 +2,8 @@ export const email = 'email';
 
 export const authToken = 'auth-token';
 
-export const errorRegisterMsg = 'Invalid register attempt!';
-export const errorLoginMsg = 'Invalid login attempt!';
+export const InvalidRegisterCredentials = 'Invalid register attempt!';
+export const InvalidLoginCredentials = 'Invalid login attempt!';
 
 export const routesMovie = {
     home: '/home',

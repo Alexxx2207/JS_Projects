@@ -1,4 +1,5 @@
-import { authToken, email } from "../constants.js"
+import { authToken, email } from "../utils/constants.js";
+import { getUserInformation } from "../utils/api.js";
 
 let userBtns = Array.from(document.querySelectorAll('nav .user'));
 let userWelcome = document.querySelector('#welcome-msg');
@@ -13,16 +14,5 @@ export function updateAuth() {
         userWelcome.textContent = `Welcome, ${sessionStorage.getItem(email)}`;
     } else {
         guestBtns.forEach(btn => btn.style.display = 'inline');
-
     }
-}
-
-export async function getUser() {
-    let response = await fetch('http://localhost:3030/users/me', {
-        headers: {
-            'X-Authorization': sessionStorage.getItem(authToken)
-        }
-    });
-
-    return await response.json();
 }

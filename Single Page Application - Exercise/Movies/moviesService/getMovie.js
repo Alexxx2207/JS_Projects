@@ -1,20 +1,21 @@
 import { deleteFilm } from "./deleteMovie.js";
 import { likeMovie, getLikes, isAlreadyLiked } from "./likeMovie.js";
-import { getUser } from "../authService/authentication.js";
 import { fillEditForm } from "./editMovie.js";
-import { router } from "../router.js";
-import { authToken, routesMovie } from "../constants.js";
+import { router } from "../utils/router.js";
+import { authToken, routesMovie } from "../utils/constants.js";
+import { sendGetMovieRequest, getUserInformation } from '../utils/api.js';
 
 const movieList = document.getElementById('movies');
 
-export async function renderMovieSection() {
+export function renderMovieSection() {
     movieList.style.display = 'block';
 
-    let movies = await loadMovies();
-    renderMovies(movies);
+    renderMovies();
 }
 
-async function renderMovies(movies) {
+async function renderMovies() {
+    let movies = await loadMovies();
+
     let fragment = document.createDocumentFragment();
 
     movies.forEach(movie => {
@@ -75,35 +76,37 @@ async function renderMovies(movies) {
 }
 
 async function loadMovies() {
-    let response = await fetch('http://localhost:3030/data/movies', {
-        method: 'GET'
-    });
+    let response = await sendGetMovieRequest();
 
     let data = await response.json();
     return data;
 }
 
-function configureButtonsDisplays(movie, deleteBtn, editBtn, likeBtn, likeSpan) {
+
+// This kind of filtration logic should be done on the server, because with that implementation
+// we call the api twice for every film. It's time-consuming for the server to process.
+async function configureButtonsDisplays(movie, deleteBtn, editBtn, likeBtn, likeSpan) {
 
     let token = sessionStorage.getItem(authToken);
     if (token) {
-        getUser().then(user => {
+
+        let user = await (await getUserInformation()).json();
+        
+        if (user._id == movie._ownerId) {
+            likeBtn.style.display = 'none';
+        }
+        else {
+            deleteBtn.style.display = 'none';
+            editBtn.style.display = 'none';
             isAlreadyLiked(movie._id, user._id).then(res => {
                 if (res) {
                     likeBtn.style.display = 'none';
-                } else if (user._id != movie._ownerId) {
+                } else {
                     likeSpan.style.display = 'none';
                 }
             });
-            if (user._id == movie._ownerId) {
-                likeBtn.style.display = 'none';
-                likeBtn.style.display = 'none';
-            }
-            if (user._id != movie._ownerId) {
-                deleteBtn.style.display = 'none';
-                editBtn.style.display = 'none';
-            }
-        });
+        }
+
     } else {
         deleteBtn.style.display = 'none';
         editBtn.style.display = 'none';

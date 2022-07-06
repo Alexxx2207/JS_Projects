@@ -1,5 +1,7 @@
-import { router } from "../router.js";
-import { routesMovie, authToken } from "../constants.js";
+import { router } from "../utils/router.js";
+import { routesMovie } from "../utils/constants.js";
+import { sendAddMovieRequest } from "../utils/api.js";
+
 
 const addMovieSection = document.getElementById('add-movie');
 const addMovieForm = document.getElementById('add-movie-form');
@@ -31,12 +33,5 @@ function getFormData() {
 }
 
 async function addMovie(movie) {
-    await fetch('http://localhost:3030/data/movies', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-Authorization': sessionStorage.getItem(authToken)
-        },
-        body: JSON.stringify(movie)
-    });
+    await sendAddMovieRequest(movie.title, movie.description, movie.img);
 }

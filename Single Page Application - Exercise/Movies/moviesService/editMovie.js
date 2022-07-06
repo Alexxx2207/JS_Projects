@@ -1,5 +1,6 @@
-import { router } from "../router.js";
-import { routesMovie, authToken } from "../constants.js";
+import { router } from "../utils/router.js";
+import { routesMovie } from "../utils/constants.js";
+import { sendEditMovieRequest, sendGetParticularMovieRequest } from "../utils/api.js";
 
 const editSection = document.getElementById('edit-movie');
 const editForm = editSection.querySelector('form');
@@ -32,21 +33,14 @@ function getFormData() {
 
 
 async function editMovie(movie, id) {
-    await fetch(`http://localhost:3030/data/movies/${id}`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-Authorization': sessionStorage.getItem(authToken)
-        },
-        body: JSON.stringify(movie)
-    });
+    await sendEditMovieRequest(id, movie.title, movie.description, movie.img);
     router(routesMovie.home);
 }
 
 export async function fillEditForm(id) {
     movieId = id;
 
-    let response = await fetch(`http://localhost:3030/data/movies/${id}`);
+    let response = await sendGetParticularMovieRequest(id);
 
     let movie = await response.json();
 

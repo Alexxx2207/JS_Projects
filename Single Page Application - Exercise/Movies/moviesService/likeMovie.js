@@ -1,33 +1,33 @@
-import { authToken, routesMovie } from "../constants.js";
-import { getUser } from "../authService/authentication.js";
-import { router } from '../router.js';
+import { routesMovie } from "../utils/constants.js";
+import { router } from '../utils/router.js';
+import {
+    getUserInformation,
+    sendGetLikesCountForParticularMovie,
+    sendGetLikeForParticularUserAndMovieRequest,
+    sendPostLikeRequest
+} from '../utils/api.js';
 
 export async function getLikes(movieId) {
-    let response  = await fetch(`http://localhost:3030/data/likes?where=movieId%3D%22${movieId}%22&distinct=_ownerId&count`);
-    
+    let response = await sendGetLikesCountForParticularMovie(movieId);
+
     return await response.json();
 }
 
 export async function likeMovie(movieId, ownerId) {
-    let user = await getUser();
+    let response = await getUserInformation();
+
+    let user = await response.json();
 
     let isAlreadyliked = !(await isAlreadyLiked(movieId, user._id));
 
-    if(user._id != ownerId && isAlreadyliked) {
-        await fetch('http://localhost:3030/data/likes', {
-            method: 'POST',
-            headers: {
-                "X-Authorization": sessionStorage.getItem(authToken)
-            },
-            body: JSON.stringify({
-                movieId
-            })
-        })
-        router(routesMovie.home);
+    if (user._id != ownerId && isAlreadyliked) {
+        await sendPostLikeRequest(movieId);
     }
+    router(routesMovie.home);
 }
+
 export async function isAlreadyLiked(movieId, userId) {
-    let response  = await fetch(`http://localhost:3030/data/likes?where=movieId%3D%22${movieId}%22%20and%20_ownerId%3D%22${userId}%22`);
+    let response = await sendGetLikeForParticularUserAndMovieRequest(movieId, userId);
 
     let data = await response.json();
 

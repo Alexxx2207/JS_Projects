@@ -1,5 +1,5 @@
-import { router } from './router.js';
-import { routesMovie } from './constants.js';
+import { router } from './utils/router.js';
+import { routesMovie } from './utils/constants.js';
 
 router(routesMovie.home);
 

@@ -1,14 +1,10 @@
-import { authToken, routesMovie } from '../constants.js';
-import { router } from '../router.js';
+import { routesMovie } from '../utils/constants.js';
+import { router } from '../utils/router.js';
+import { sendDeleteMovieRequest } from "../utils/api.js";
 
 
 export async function deleteFilm(id) {
-    await fetch(`http://localhost:3030/data/movies/${id}`, {
-        method: 'DELETE',
-        headers: {
-            'X-Authorization': sessionStorage.getItem(authToken)
-        }
-    });
+    await sendDeleteMovieRequest(id);
 
     router(routesMovie.home);
 }

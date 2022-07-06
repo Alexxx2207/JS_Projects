@@ -1,6 +1,8 @@
-import { authToken, email, routesMovie, errorRegisterMsg } from '../constants.js';
-import { router } from "../router.js";
-import { updateAuth } from './authentication.js'
+import { authToken, email, routesMovie, InvalidRegisterCredentials } from '../utils/constants.js';
+import { router } from "../utils/router.js";
+import { updateAuth } from './authentication.js';
+import { sendRegisterRequest } from "../utils/api.js";
+
 
 export function renderRegister() {
     document.getElementById('form-sign-up').style.display = 'block';
@@ -11,9 +13,9 @@ export function renderRegister() {
         
         let data = getFormData();
         if(data.email && data.password && data.password.length >= 6 && data.password === data.repeatPassword) {
-            sendRegisterRequest(data);
+            sendRequest(data);
         } else {
-            document.getElementById('register-error').textContent = errorRegisterMsg;
+            document.getElementById('register-error').textContent = InvalidRegisterCredentials;
             document.getElementById('register-error').style.display = 'block';
         }
     });
@@ -32,18 +34,12 @@ function getFormData() {
     return data;
 }
 
-async function sendRegisterRequest(data) {
+async function sendRequest(data) {
     try {
-        let response = await fetch('http://localhost:3030/users/register', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        });
+        let response = await sendRegisterRequest(data.email, data.password);
 
-        if (response.status > 400) {
-            throw new Error('Invalid register attempt!');
+        if (response.status >= 400) {
+            throw new Error(InvalidRegisterCredentials);
         }
         let responseBody = await response.json();
 
@@ -53,7 +49,7 @@ async function sendRegisterRequest(data) {
         updateAuth();
 
     } catch (error) {
-        document.getElementById('register-error').textContent = errorRegisterMsg;
+        document.getElementById('register-error').textContent = error;
         document.getElementById('register-error').style.display = 'block';
     }
 

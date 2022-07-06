@@ -1,6 +1,7 @@
-import { authToken, email, routesMovie, errorLoginMsg } from '../constants.js';
-import { router } from '../router.js';
-import { updateAuth } from './authentication.js'
+import { authToken, email, routesMovie, InvalidLoginCredentials } from '../utils/constants.js';
+import { router } from '../utils/router.js';
+import { updateAuth } from './authentication.js';
+import { sendLoginRequest } from "../utils/api.js";
 
 export function renderLogin() {
     document.getElementById('form-login').style.display = 'block';
@@ -8,7 +9,7 @@ export function renderLogin() {
 
     document.querySelector('#form-login button').addEventListener('click', function (e) {
         e.preventDefault();
-        sendLoginRequest(getFormData());
+        sendRequest(getFormData());
     });
 }
 
@@ -20,27 +21,22 @@ function getFormData() {
     return data;
 }
 
-async function sendLoginRequest(data) {
+async function sendRequest(data) {
     try {
-        let response = await fetch('http://localhost:3030/users/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        });
+        let response = await sendLoginRequest(data.email, data.password);
 
-        if (response.status > 400) {
-            throw new Error('Invalid login attempt!');
-        }
         let responseBody = await response.json();
+
+        if(response.status == 403) {
+            throw new Error(InvalidLoginCredentials);
+        }
 
         sessionStorage.setItem(email, responseBody.email);
         sessionStorage.setItem(authToken, responseBody.accessToken);
         router(routesMovie.home);
         updateAuth();
     } catch (error) {
-        document.getElementById('login-error').textContent = errorLoginMsg;
+        document.getElementById('login-error').textContent = error;
         document.getElementById('login-error').style.display = 'block';
     }
 }
